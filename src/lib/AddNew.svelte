@@ -1,19 +1,22 @@
 <script>
+  import supabase from '../config/supabaseClient'
   import { createEventDispatcher } from 'svelte'
 
   const dispatch = createEventDispatcher()
 
-  import supabase from '../config/supabaseClient'
-
+  export let id = null
   export let title = ''
   export let method = ''
   export let rating = ''
 
-  const handleClick = async () => {
+  const handleAdd = async () => {
     if (!title || !method || !rating) return
 
-    const { data, error } = await supabase.from('smoothies').insert([{ title, method, rating }])
+    id && (await supabase.from('smoothies').update({ title, method, rating }).eq('id', id))
 
+    !id && (await supabase.from('smoothies').insert([{ title, method, rating }]))
+
+    id = ''
     title = ''
     method = ''
     rating = ''
@@ -27,7 +30,7 @@
   <input type="text" bind:value={title} placeholder="Title" />
   <input type="text" bind:value={method} placeholder="Method" />
   <input type="text" bind:value={rating} placeholder="Rating" />
-  <button on:click={handleClick}>Add New</button>
+  <button on:click={handleAdd}>Add New / Update</button>
 </div>
 
 <style>

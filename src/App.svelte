@@ -6,31 +6,38 @@
   let data = []
   let error = null
 
-  let title, method, rating
+  let id, title, method, rating
 
   const getSmoothies = async () => {
-    const { data: smoothies, error: _error } = await supabase.from('smoothies').select('*')
+    error = null
+    const { data: smoothies, error: _error } = await supabase
+      .from('smoothies')
+      .select('*')
+      .order('created_at', { ascending: true })
     data = smoothies
     error = _error
   }
 
-  getSmoothies()
-
-  const handleDelete = async idx => {
-    const { data, error } = await supabase.from('smoothies').delete().eq('id', idx)
+  const handleDelete = async evt => {
+    await supabase.from('smoothies').delete().eq('id', evt.detail)
     getSmoothies()
   }
 
-  const handleUpdate = async idx => {
-    const { data: smoothies, error } = await supabase.from('smoothies').select('*').eq('id', idx)
+  const handleUpdate = async evt => {
+    const { data: smoothies, error } = await supabase
+      .from('smoothies')
+      .select('*')
+      .eq('id', evt.detail)
+    id = smoothies[0].id
     title = smoothies[0].title
     method = smoothies[0].method
     rating = smoothies[0].rating
-    handleDelete(smoothies[0].id)
   }
+
+  getSmoothies()
 </script>
 
-<AddNew {title} {method} {rating} on:added={getSmoothies} />
+<AddNew bind:id bind:title bind:method bind:rating on:added={getSmoothies} />
 
 <h1>Smoothies</h1>
 <main>
@@ -38,12 +45,8 @@
     <p>{error.message}</p>
   {/if}
 
-  {#each data as item, _ (item.id)}
-    <Card
-      {item}
-      on:delete={() => handleDelete(item.id)}
-      on:update={evt => handleUpdate(evt.detail)}
-    />
+  {#each data as item}
+    <Card {item} on:delete={handleDelete} on:update={handleUpdate} />
   {/each}
 </main>
 

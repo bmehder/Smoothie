@@ -5,16 +5,14 @@
   const dispatch = createEventDispatcher()
 
   export let item = {}
-
-  const { id, title, method, rating } = item
 </script>
 
 <article transition:fade>
-  <h2>{title}</h2>
-  <p>{method}</p>
-  <span>{rating}</span>
-  <button on:click={() => dispatch('update', id)}>Update</button>
-  <button on:click={() => dispatch('delete')}>Delete</button>
+  <h2>{item.title}</h2>
+  <p>{item.method}</p>
+  <span>{item.rating}</span>
+  <button on:click={() => dispatch('update', item.id)}>Update</button>
+  <button on:click={() => dispatch('delete', item.id)}>Delete</button>
 </article>
 
 <style>
