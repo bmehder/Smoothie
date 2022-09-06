@@ -1,52 +1,68 @@
 <script>
   import supabase from './config/supabaseClient'
-  import AddNew from './lib/AddNew.svelte'
+  import AddNew from './lib/AddUpdate.svelte'
   import Card from './lib/Card.svelte'
 
   let data = []
   let error = null
 
-  let id, title, method, rating
+  const form = {
+    id: null,
+    title: null,
+    method: null,
+    rating: null,
+  }
 
-  const getSmoothies = async () => {
+  const getAllSmoothies = async () => {
     error = null
+
     const { data: smoothies, error: _error } = await supabase
       .from('smoothies')
       .select('*')
       .order('created_at', { ascending: true })
+
     data = smoothies
     error = _error
   }
 
   const handleDelete = async evt => {
     await supabase.from('smoothies').delete().eq('id', evt.detail)
-    getSmoothies()
   }
 
-  const handleUpdate = async evt => {
+  const getSmoothie = async evt => {
     const { data: smoothies, error } = await supabase
       .from('smoothies')
       .select('*')
       .eq('id', evt.detail)
-    id = smoothies[0].id
-    title = smoothies[0].title
-    method = smoothies[0].method
-    rating = smoothies[0].rating
+      .single()
+
+    form.id = smoothies.id
+    form.title = smoothies.title
+    form.method = smoothies.method
+    form.rating = smoothies.rating
   }
 
-  getSmoothies()
+  const init = (node, params) => {
+    getAllSmoothies()
+
+    return {
+      update(newParams) {
+        getAllSmoothies()
+      },
+    }
+  }
 </script>
 
-<AddNew bind:id bind:title bind:method bind:rating on:added={getSmoothies} />
+<AddNew {...form} />
 
 <h1>Smoothies</h1>
-<main>
+<main use:init={data}>
   {#if error}
     <p>{error.message}</p>
   {/if}
 
   {#each data as item}
-    <Card {item} on:delete={handleDelete} on:update={handleUpdate} />
+    <Card {item} on:delete={handleDelete} on:update={getSmoothie} />
   {/each}
 </main>
 

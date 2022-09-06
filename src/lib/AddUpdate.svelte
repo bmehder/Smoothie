@@ -1,27 +1,27 @@
 <script>
   import supabase from '../config/supabaseClient'
-  import { createEventDispatcher } from 'svelte'
-
-  const dispatch = createEventDispatcher()
 
   export let id = null
   export let title = ''
   export let method = ''
   export let rating = ''
 
-  const handleAdd = async () => {
+  const resetForm = () => (id = '') || (title = '') || (method = '') || (rating = '')
+
+  const addSmoothie = async () =>
+    await supabase.from('smoothies').insert([{ title, method, rating }])
+
+  const updateSmoothie = async id =>
+    await supabase.from('smoothies').update({ title, method, rating }).eq('id', id)
+
+  const handleAddOrUpdate = async () => {
     if (!title || !method || !rating) return
 
-    id && (await supabase.from('smoothies').update({ title, method, rating }).eq('id', id))
+    !id && addSmoothie()
 
-    !id && (await supabase.from('smoothies').insert([{ title, method, rating }]))
+    id && updateSmoothie(id)
 
-    id = ''
-    title = ''
-    method = ''
-    rating = ''
-
-    dispatch('added')
+    resetForm()
   }
 </script>
 
@@ -30,7 +30,7 @@
   <input type="text" bind:value={title} placeholder="Title" />
   <input type="text" bind:value={method} placeholder="Method" />
   <input type="text" bind:value={rating} placeholder="Rating" />
-  <button on:click={handleAdd}>Add New / Update</button>
+  <button on:click={handleAddOrUpdate}>Add New / Update</button>
 </div>
 
 <style>
