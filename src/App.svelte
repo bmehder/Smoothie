@@ -5,13 +5,12 @@
 
   let data = []
   let error = null
+  let isShowAddUpdate = false
 
-  const form = {
-    id: null,
-    title: null,
-    method: null,
-    rating: null,
-  }
+  let id = null
+  let title = null
+  let method = null
+  let rating = null
 
   const getAllSmoothies = async () => {
     error = null
@@ -29,6 +28,8 @@
     await supabase.from('smoothies').delete().eq('id', evt.detail)
   }
 
+  const handleClick = () => (isShowAddUpdate = !isShowAddUpdate)
+
   const getSmoothie = async evt => {
     const { data: smoothies, error } = await supabase
       .from('smoothies')
@@ -36,10 +37,12 @@
       .eq('id', evt.detail)
       .single()
 
-    form.id = smoothies.id
-    form.title = smoothies.title
-    form.method = smoothies.method
-    form.rating = smoothies.rating
+    id = smoothies.id
+    title = smoothies.title
+    method = smoothies.method
+    rating = smoothies.rating
+
+    isShowAddUpdate = true
   }
 
   const init = (node, params) => {
@@ -53,9 +56,16 @@
   }
 </script>
 
-<AddNew {...form} />
+{#if isShowAddUpdate}
+  <AddNew bind:id bind:title bind:method bind:rating bind:isShowAddUpdate />
+{/if}
 
 <h1>Smoothies</h1>
+<h2 on:click={handleClick}>
+  <span class="material-symbols-outlined" class:isShowAddUpdate> add_circle </span>
+  <p>{isShowAddUpdate ? 'Close' : 'Add New'}</p>
+</h2>
+
 <main use:init={data}>
   {#if error}
     <p>{error.message}</p>
@@ -67,9 +77,30 @@
 </main>
 
 <style>
+  h1 {
+    margin: 0;
+  }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  h2 span {
+    font-size: 2rem;
+    transition: all 200ms ease-in-out;
+    cursor: pointer;
+  }
+  h2 span:hover {
+    scale: 1.2;
+  }
+  .isShowAddUpdate {
+    rotate: 45deg;
+  }
   main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
     gap: 2rem;
+    margin-top: 1rem;
   }
 </style>

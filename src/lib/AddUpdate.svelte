@@ -1,12 +1,19 @@
 <script>
   import supabase from '../config/supabaseClient'
+  import { slide } from 'svelte/transition'
 
   export let id = null
   export let title = ''
   export let method = ''
   export let rating = ''
+  export let isShowAddUpdate
 
-  const resetForm = () => (id = '') || (title = '') || (method = '') || (rating = '')
+  const resetForm = () => {
+    id = ''
+    title = ''
+    method = ''
+    rating = ''
+  }
 
   const addSmoothie = async () =>
     await supabase.from('smoothies').insert([{ title, method, rating }])
@@ -22,11 +29,13 @@
     id && updateSmoothie(id)
 
     resetForm()
+
+    isShowAddUpdate = false
   }
 </script>
 
-<div>
-  <h3>Add New Smoothie</h3>
+<div transition:slide>
+  <h3>Add New / Update</h3>
   <input type="text" bind:value={title} placeholder="Title" />
   <input type="text" bind:value={method} placeholder="Method" />
   <input type="text" bind:value={rating} placeholder="Rating" />
@@ -43,6 +52,7 @@
   }
   h3 {
     margin-bottom: 0;
+    text-align: center;
   }
   input,
   button {
