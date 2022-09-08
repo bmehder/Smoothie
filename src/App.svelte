@@ -27,6 +27,7 @@
 
   const handleDelete = async evt => {
     await supabase.from('smoothies').delete().eq('id', evt.detail)
+    getAllSmoothies()
   }
 
   const handleClick = () => (isShowAddUpdate = !isShowAddUpdate)
@@ -34,7 +35,7 @@
   const getSmoothie = async evt => {
     const { data: smoothies, error } = await supabase
       .from('smoothies')
-      .select('*')
+      .select()
       .eq('id', evt.detail)
       .single()
 
@@ -46,19 +47,13 @@
     isShowAddUpdate = true
   }
 
-  const init = (node, params) => {
+  const init = node => {
     getAllSmoothies()
-
-    return {
-      update(newParams) {
-        getAllSmoothies()
-      },
-    }
   }
 </script>
 
 {#if isShowAddUpdate}
-  <AddNew bind:id bind:title bind:method bind:rating bind:isShowAddUpdate />
+  <AddNew bind:id bind:title bind:method bind:rating bind:isShowAddUpdate {getAllSmoothies} />
 {/if}
 
 <h1>Smoothies</h1>
@@ -66,13 +61,15 @@
   <span class="material-symbols-outlined" class:isShowAddUpdate> add_circle </span>
   <p>{isShowAddUpdate ? 'Close' : 'Add New'}</p>
 </h2>
-<select bind:value={orderBy}>
+
+<label for="order-by">Sort by:</label>
+<select name="order-by" bind:value={orderBy} on:change={getAllSmoothies}>
   <option value="created_at">Created At</option>
   <option value="title">Title</option>
   <option value="rating">Rating</option>
 </select>
 
-<main use:init={data}>
+<main use:init>
   {#if error}
     <p>{error.message}</p>
   {/if}

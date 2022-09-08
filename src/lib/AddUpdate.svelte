@@ -6,7 +6,8 @@
   export let title = ''
   export let method = ''
   export let rating = ''
-  export let isShowAddUpdate
+  export let isShowAddUpdate = false
+  export let getAllSmoothies
 
   const resetForm = () => {
     id = ''
@@ -31,19 +32,21 @@
     resetForm()
 
     isShowAddUpdate = false
+
+    getAllSmoothies()
   }
 </script>
 
-<div transition:slide>
+<form on:submit|preventDefault={handleAddOrUpdate} transition:slide>
   <h3>Add New / Update</h3>
   <input type="text" bind:value={title} placeholder="Title" />
   <input type="text" bind:value={method} placeholder="Method" />
   <input type="text" bind:value={rating} placeholder="Rating" />
-  <button on:click={handleAddOrUpdate}>Add New / Update</button>
-</div>
+  <input type="submit" value="Add New / Update" />
+</form>
 
 <style>
-  div {
+  form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -54,8 +57,7 @@
     margin-bottom: 0;
     text-align: center;
   }
-  input,
-  button {
+  input {
     padding: 0.5rem;
   }
 </style>
