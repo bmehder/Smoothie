@@ -6,6 +6,7 @@
   let data = []
   let error = null
   let isShowAddUpdate = false
+  let orderBy = 'created_at'
 
   let id = null
   let title = null
@@ -18,7 +19,7 @@
     const { data: smoothies, error: _error } = await supabase
       .from('smoothies')
       .select('*')
-      .order('created_at', { ascending: true })
+      .order(orderBy, { ascending: true })
 
     data = smoothies
     error = _error
@@ -65,6 +66,11 @@
   <span class="material-symbols-outlined" class:isShowAddUpdate> add_circle </span>
   <p>{isShowAddUpdate ? 'Close' : 'Add New'}</p>
 </h2>
+<select bind:value={orderBy}>
+  <option value="created_at">Created At</option>
+  <option value="title">Title</option>
+  <option value="rating">Rating</option>
+</select>
 
 <main use:init={data}>
   {#if error}
@@ -85,11 +91,11 @@
     align-items: center;
     gap: 0.5rem;
     margin: 0;
+    cursor: pointer;
   }
   h2 span {
     font-size: 2rem;
     transition: all 200ms ease-in-out;
-    cursor: pointer;
   }
   h2 span:hover {
     scale: 1.2;
@@ -97,10 +103,13 @@
   .isShowAddUpdate {
     rotate: 45deg;
   }
+  select {
+    padding: 0.5rem 1rem;
+  }
   main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
     gap: 2rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
   }
 </style>
